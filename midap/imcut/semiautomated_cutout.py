@@ -5,6 +5,7 @@ import multiprocessing as mp
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.widgets import RectangleSelector
+from matplotlib.backend_bases import MouseButton
 from scipy.signal import find_peaks_cwt
 from skimage.registration import phase_cross_correlation
 
@@ -175,9 +176,8 @@ class SemiAutomatedCutout(CutoutImage):
         rs = RectangleSelector(
             self.ax[0],
             self.line_select_callback,
-            drawtype="box",
             useblit=True,
-            button=[1],
+            button=MouseButton.LEFT,
             minspanx=5,
             minspany=5,
             spancoords="pixels",
