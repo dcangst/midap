@@ -1,21 +1,23 @@
 import os
-
-import git
-
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
 
+import git
+
 # Get all subclasses to check validity of config
 ################################################
 
+from midap.imcut import *
+from midap.imcut import base_cutout
+from midap.segmentation import *
+from midap.segmentation import base_segmentator
+from midap.tracking import *
+from midap.tracking import base_tracking
 from midap.utils import get_inheritors
 
 # get all subclasses from the imcut
-from midap.imcut import *
-from midap.imcut import base_cutout
-
 IMCUT_CLS = [subclass for subclass in get_inheritors(base_cutout.CutoutImage)]
 FAMILY_IMCUT_CLS = [
     s.__name__ for s in IMCUT_CLS if "Family_Machine" in s.supported_setups
@@ -25,27 +27,13 @@ MOTHER_IMCUT_CLS = [
 ]
 
 # get all subclasses from the segmentations
-from midap.segmentation import *
-from midap.segmentation import base_segmentator
-
 SEG_CLS = [
     subclass for subclass in get_inheritors(base_segmentator.SegmentationPredictor)
 ]
-FAMILY_SEG_CLS = [
-    s.__name__
-    for s in SEG_CLS
-    if "Family_Machine" in s.supported_setups
-]
-MOTHER_SEG_CLS = [
-    s.__name__
-    for s in SEG_CLS
-    if "Mother_Machine" in s.supported_setups
-]
+FAMILY_SEG_CLS = [s.__name__ for s in SEG_CLS if "Family_Machine" in s.supported_setups]
+MOTHER_SEG_CLS = [s.__name__ for s in SEG_CLS if "Mother_Machine" in s.supported_setups]
 
 # get all subclasses from the tracking
-from midap.tracking import *
-from midap.tracking import base_tracking
-
 TRACKING_CLS = [
     subclass.__name__ for subclass in get_inheritors(base_tracking.Tracking)
 ]
