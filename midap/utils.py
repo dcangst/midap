@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 import threading
-from typing import Collection, Union, Tuple, Optional
+from typing import Union, Tuple, Optional, Any
 
 import midap.apps.PySimpleGUI as sg
 import matplotlib.pyplot as plt
@@ -109,21 +109,53 @@ def convert_to_bytes(
         return bio.getvalue()
 
 
+def _gui_selector_button(
+    buf: bytes, label: Any, marked: bool = False
+) -> sg.Button:
+    """Creates a button for the GUI selector with the given image and label, and marks it if specified
+    :param buf: The image to display on the button as bytes
+    :param label: The key for the button
+    :param marked: Whether the button should be marked as selected
+    :return: The created button
+    """
+    if marked:
+        button_color = ("black", "yellow")
+    else:
+        button_color = (sg.theme_background_color(), sg.theme_background_color())
+    return sg.Button(
+        "",
+        image_data=buf,
+        button_color=button_color,
+        border_width=5,
+        key=label,
+    )
+
+
 def GUI_selector(
-    figures: Collection[plt.Figure], labels: Collection[str], title="", close_figs=True
-):
+    figures: list[plt.Figure],
+    labels: list[Any],
+    title: str = "",
+    close_figs: bool = True,
+    multiselect: bool = False,
+    marked: list[Any] | None = None,
+) -> Union[Any, list[Any]]:
     """
     Starts up a GUI selector for imgs and labels
     :param figures: A list of figures that will presented in the GUI as buttons that the user can select
     :param labels: A list of labels corresponding to the input images
     :param title: Title for the GUI
     :param close_figs: Close all figures after the GUI has extracted the data
-    :return: The label that the user selected by clicking on the corresponding image
+    :param multiselect: If True, allow multiple selections
+    :param marked: The label(s) that should be marked as selected initially
+    :return: The label(s) that the user selected by clicking on the corresponding image
     """
 
     # check
     if len(figures) != len(labels):
-        raise ValueError("Number of figures does not math number of labels!")
+        raise ValueError("Number of figures does not match number of labels!")
+
+    if marked is None:
+        marked = [labels[0]]
 
     # get the number of cols for the layout
     num_cols = int(np.ceil(np.sqrt(len(labels))))
@@ -132,7 +164,7 @@ def GUI_selector(
     buffers = []
     buttons = []
     new_line = []
-    for i, (fig, label) in enumerate(zip(figures, labels)):
+    for fig, label in zip(figures, labels):
         # figure to buffer
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
@@ -140,30 +172,7 @@ def GUI_selector(
         buf = convert_to_bytes(buf.read())
         buffers.append(buf)
         # the first button starts as selected
-        if i == 0:
-            new_line.append(
-                sg.Button(
-                    "",
-                    image_data=buf,
-                    button_color=("black", "yellow"),
-                    border_width=5,
-                    key=label,
-                )
-            )
-            marked = label
-        else:
-            new_line.append(
-                sg.Button(
-                    "",
-                    image_data=buf,
-                    button_color=(
-                        sg.theme_background_color(),
-                        sg.theme_background_color(),
-                    ),
-                    border_width=5,
-                    key=label,
-                )
-            )
+        new_line.append(_gui_selector_button(buf, label, marked=label in marked))
         if len(new_line) == num_cols:
             buttons.append(new_line)
             new_line = []
@@ -216,23 +225,29 @@ def GUI_selector(
     # Event Loop
     while True:
         # Read event
-        event, values = window.read()
+        event, _ = window.read()
         # break if we have one of these
         if event in (sg.WIN_CLOSED, "Exit", "Cancel", "OK"):
             break
 
         # get the last event
-        for i, l in enumerate(labels):
+        for label in labels:
             # if the last event was an image button click, mark it
-            if event == l:
-                marked = l
+            if event == label:
+                if multiselect:
+                    if label in marked:
+                        marked.remove(label)
+                    else:
+                        marked.append(label)
+                else:
+                    marked = [label]
                 break
-        # maked button is highlighted
-        for l in labels:
-            if marked == l:
-                window[l].update(button_color=("black", "yellow"))
+        # marked button is highlighted
+        for label in labels:
+            if label in marked:
+                window[label].update(button_color=("black", "yellow"))
             else:
-                window[l].update(
+                window[label].update(
                     button_color=(
                         sg.theme_background_color(),
                         sg.theme_background_color(),
@@ -267,4 +282,7 @@ def GUI_selector(
     if event != "OK":
         raise InterruptedError("GUI was cancelled or unexpectedly closed, exiting...")
 
-    return marked
+    if multiselect:
+        return marked
+    else:
+        return marked[0]
