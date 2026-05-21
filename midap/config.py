@@ -272,13 +272,13 @@ class Config(ConfigParser):
         if machine_type == "Family_Machine":
             if self.get(id_name, "CutImgClass") not in FAMILY_IMCUT_CLS:
                 raise ValueError(f"'Class' of 'CutImg' not in {FAMILY_IMCUT_CLS}")
-            if self.get(id_name, "SegmentationClass") not in family_seg_cls:
-                raise ValueError(f"'Class' of 'Segmentation' not in {family_seg_cls}")
+            if self.get(id_name, "SegmentationClass") not in FAMILY_SEG_CLS:
+                raise ValueError(f"'Class' of 'Segmentation' not in {FAMILY_SEG_CLS}")
         if machine_type == "Mother_Machine":
-            if self.get(id_name, "CutImgClass") not in mother_imcut_cls:
-                raise ValueError(f"'Class' of 'CutImg' not in {mother_imcut_cls}")
-            if self.get(id_name, "SegmentationClass") not in mother_seg_cls:
-                raise ValueError(f"'Class' of 'Segmentation' not in {mother_seg_cls}")
+            if self.get(id_name, "CutImgClass") not in MOTHER_IMCUT_CLS:
+                raise ValueError(f"'Class' of 'CutImg' not in {MOTHER_IMCUT_CLS}")
+            if self.get(id_name, "SegmentationClass") not in MOTHER_SEG_CLS:
+                raise ValueError(f"'Class' of 'Segmentation' not in {MOTHER_SEG_CLS}")
         if self.get(id_name, "TrackingClass") not in TRACKING_CLS:
             raise ValueError(f"'Class' of 'Tracking' not in {TRACKING_CLS}")
 
