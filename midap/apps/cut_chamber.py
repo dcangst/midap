@@ -4,6 +4,7 @@ import os
 # import to get all subclasses
 from midap.imcut import *
 from midap.imcut import base_cutout
+from midap.utils import get_inheritors
 
 from typing import Optional, Union, Iterable
 
@@ -27,7 +28,7 @@ def main(
     """
     # get the right subclass
     class_instance = None
-    for subclass in base_cutout.CutoutImage.__subclasses__():
+    for subclass in get_inheritors(base_cutout.CutoutImage):
         if subclass.__name__ == cutout_class:
             class_instance = subclass
 
