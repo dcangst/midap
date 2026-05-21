@@ -16,29 +16,29 @@ from midap.utils import get_inheritors
 from midap.imcut import *
 from midap.imcut import base_cutout
 
-imcut_subclasses = [subclass for subclass in get_inheritors(base_cutout.CutoutImage)]
-family_imcut_cls = [
-    s.__name__ for s in imcut_subclasses if "Family_Machine" in s.supported_setups
+IMCUT_CLS = [subclass for subclass in get_inheritors(base_cutout.CutoutImage)]
+FAMILY_IMCUT_CLS = [
+    s.__name__ for s in IMCUT_CLS if "Family_Machine" in s.supported_setups
 ]
-mother_imcut_cls = [
-    s.__name__ for s in imcut_subclasses if "Mother_Machine" in s.supported_setups
+MOTHER_IMCUT_CLS = [
+    s.__name__ for s in IMCUT_CLS if "Mother_Machine" in s.supported_setups
 ]
 
 # get all subclasses from the segmentations
 from midap.segmentation import *
 from midap.segmentation import base_segmentator
 
-segmentation_subclasses = [
+SEG_CLS = [
     subclass for subclass in get_inheritors(base_segmentator.SegmentationPredictor)
 ]
-family_seg_cls = [
+FAMILY_SEG_CLS = [
     s.__name__
-    for s in segmentation_subclasses
+    for s in SEG_CLS
     if "Family_Machine" in s.supported_setups
 ]
-mother_seg_cls = [
+MOTHER_SEG_CLS = [
     s.__name__
-    for s in segmentation_subclasses
+    for s in SEG_CLS
     if "Mother_Machine" in s.supported_setups
 ]
 
@@ -46,10 +46,10 @@ mother_seg_cls = [
 from midap.tracking import *
 from midap.tracking import base_tracking
 
-tracking_subclasses = [
+TRACKING_CLS = [
     subclass.__name__ for subclass in get_inheritors(base_tracking.Tracking)
 ]
-tracking_subclasses.remove("DeltaTypeTracking")
+TRACKING_CLS.remove("DeltaTypeTracking")
 
 
 class Config(ConfigParser):
@@ -282,8 +282,8 @@ class Config(ConfigParser):
 
         # check all the classes
         if machine_type == "Family_Machine":
-            if self.get(id_name, "CutImgClass") not in family_imcut_cls:
-                raise ValueError(f"'Class' of 'CutImg' not in {family_imcut_cls}")
+            if self.get(id_name, "CutImgClass") not in FAMILY_IMCUT_CLS:
+                raise ValueError(f"'Class' of 'CutImg' not in {FAMILY_IMCUT_CLS}")
             if self.get(id_name, "SegmentationClass") not in family_seg_cls:
                 raise ValueError(f"'Class' of 'Segmentation' not in {family_seg_cls}")
         if machine_type == "Mother_Machine":
@@ -291,8 +291,8 @@ class Config(ConfigParser):
                 raise ValueError(f"'Class' of 'CutImg' not in {mother_imcut_cls}")
             if self.get(id_name, "SegmentationClass") not in mother_seg_cls:
                 raise ValueError(f"'Class' of 'Segmentation' not in {mother_seg_cls}")
-        if self.get(id_name, "TrackingClass") not in tracking_subclasses:
-            raise ValueError(f"'Class' of 'Tracking' not in {tracking_subclasses}")
+        if self.get(id_name, "TrackingClass") not in TRACKING_CLS:
+            raise ValueError(f"'Class' of 'Tracking' not in {TRACKING_CLS}")
 
         if not basic:
             # check the corner

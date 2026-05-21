@@ -4,54 +4,10 @@ import midap.apps.PySimpleGUI as sg
 import numpy as np
 import re
 
-from glob import glob
 from pathlib import Path
 
-from midap.config import Config
-from midap.utils import get_logger, get_inheritors
-
-# Get all subclasses for the dropdown menus
-###########################################
-
-# get all subclasses from the imcut
-from midap.imcut import *
-from midap.imcut import base_cutout
-
-imcut_subclasses = [subclass for subclass in get_inheritors(base_cutout.CutoutImage)]
-family_imcut_cls = [
-    s.__name__ for s in imcut_subclasses if "Family_Machine" in s.supported_setups
-]
-mother_imcut_cls = [
-    s.__name__ for s in imcut_subclasses if "Mother_Machine" in s.supported_setups
-]
-
-
-# get all subclasses from the segmentations
-from midap.segmentation import *
-from midap.segmentation import base_segmentator
-
-segmentation_subclasses = [
-    subclass for subclass in get_inheritors(base_segmentator.SegmentationPredictor)
-]
-family_seg_cls = [
-    s.__name__
-    for s in segmentation_subclasses
-    if "Family_Machine" in s.supported_setups
-]
-mother_seg_cls = [
-    s.__name__
-    for s in segmentation_subclasses
-    if "Mother_Machine" in s.supported_setups
-]
-
-# get all subclasses from the tracking
-from midap.tracking import *
-from midap.tracking import base_tracking
-
-tracking_subclasses = [
-    subclass.__name__ for subclass in get_inheritors(base_tracking.Tracking)
-]
-tracking_subclasses.remove("DeltaTypeTracking")
+from midap.config import Config, FAMILY_SEG_CLS, MOTHER_SEG_CLS, FAMILY_IMCUT_CLS, MOTHER_IMCUT_CLS, TRACKING_CLS
+from midap.utils import get_logger
 
 
 def collapse(layout, key):
@@ -347,11 +303,11 @@ def main(config_file="settings.ini", loglevel=7):
 
         # get the vars for the specific layout
         if general["DataType"] == "Family_Machine":
-            imcut_subclasses = family_imcut_cls
-            segmentation_subclasses = family_seg_cls
+            imcut_subclasses = FAMILY_IMCUT_CLS
+            segmentation_subclasses = FAMILY_SEG_CLS
         if general["DataType"] == "Mother_Machine":
-            imcut_subclasses = mother_imcut_cls
-            segmentation_subclasses = mother_seg_cls
+            imcut_subclasses = MOTHER_IMCUT_CLS
+            segmentation_subclasses = MOTHER_SEG_CLS
 
         # Specific layout
         layout_family_machine = [
@@ -429,7 +385,7 @@ def main(config_file="settings.ini", loglevel=7):
             [
                 sg.DropDown(
                     key="track_method",
-                    values=tracking_subclasses,
+                    values=TRACKING_CLS,
                     default_value=defaults["TrackingClass"],
                 )
             ],
