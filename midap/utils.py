@@ -154,8 +154,13 @@ def GUI_selector(
     if len(figures) != len(labels):
         raise ValueError("Number of figures does not match number of labels!")
 
+    # if no marked is given, we mark the first one
     if marked is None:
         marked = [labels[0]]
+    
+    # if marked is the same as labels (i.e. all are marked), we make a copy of the list to avoid modifying the original list when we unmark some of the labels
+    if marked is labels:
+        marked = labels.copy()
 
     # get the number of cols for the layout
     num_cols = int(np.ceil(np.sqrt(len(labels))))
