@@ -6,7 +6,6 @@ import sys
 import threading
 from typing import Collection, Union, Tuple, Optional
 
-import PIL
 import midap.apps.PySimpleGUI as sg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -89,20 +88,20 @@ def convert_to_bytes(
     """
 
     if isinstance(file_or_bytes, str):
-        img = PIL.Image.open(file_or_bytes)
+        img = Image.open(file_or_bytes)
     else:
         try:
-            img = PIL.Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
-        except Exception as e:
+            img = Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
+        except Exception as _:
             dataBytesIO = io.BytesIO(file_or_bytes)
-            img = PIL.Image.open(dataBytesIO)
+            img = Image.open(dataBytesIO)
 
     cur_width, cur_height = img.size
     if resize:
         new_width, new_height = resize
         scale = min(new_height / cur_height, new_width / cur_width)
         img = img.resize(
-            (int(cur_width * scale), int(cur_height * scale)), PIL.Image.ANTIALIAS
+            (int(cur_width * scale), int(cur_height * scale)), Image.Resampling.LANCZOS
         )
     with io.BytesIO() as bio:
         img.save(bio, format="GIF")
