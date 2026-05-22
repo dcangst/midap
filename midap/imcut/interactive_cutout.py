@@ -2,6 +2,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
+from matplotlib.backend_bases import MouseButton
 
 
 from .base_cutout import CutoutImage
@@ -67,7 +68,7 @@ class InteractiveCutout(CutoutImage):
             self.ax[0],
             self.line_select_callback,
             useblit=True,
-            button=[1],
+            button=MouseButton.LEFT,
             minspanx=5,
             minspany=5,
             spancoords="pixels",
