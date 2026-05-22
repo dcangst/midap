@@ -39,6 +39,15 @@ def main(config_file="settings.ini", loglevel=7):
     appFont = ("Arial", 12)
     sg.set_options(font=appFont)
 
+    # init the config
+    logger.info(f"Config file path: {Path(config_file).absolute()}")
+    if Path(config_file).exists():
+        # restore defaults from file if it already exists.
+        logger.info("Loading initial values from existing file")
+        config = Config.from_file(config_file)
+    else:
+        config = Config(fname=config_file)
+
     # First part of the GUI
     common_params = [
         [sg.Text("Select the input data type: ", key="track_method_text", font="bold")],
@@ -46,17 +55,21 @@ def main(config_file="settings.ini", loglevel=7):
             sg.DropDown(
                 key="DataType",
                 values=["Family_Machine", "Mother_Machine"],
-                default_value="Family_Machine",
+                default_value=config.get("General", "DataType"),
             )
         ],
         [sg.Text("Choose the target folder: ", key="title_folder_name", font="bold")],
-        [sg.Input(key="folder_name"), sg.FolderBrowse()],
+        [
+            sg.Input(
+                key="folder_name",
+                default_text=config.get("General", "FolderPath")),
+                sg.FolderBrowse(initial_folder=config.get("General", "FolderPath")), ],
         [
             sg.Text(
                 "Filetype (e.g. tif, tiff, ome.tif)", key="title_file_type", font="bold"
             )
         ],
-        [sg.Input(key="file_type")],
+        [sg.Input(key="file_type", default_text=config.get("General", "FileType"))],
         [
             sg.Text(
                 "Identifier of Position/Experiment (e.g. Pos, pos)",
@@ -64,7 +77,7 @@ def main(config_file="settings.ini", loglevel=7):
                 font="bold",
             )
         ],
-        [sg.Input(key="pos")],
+        [sg.Input(key="pos", default_text=config.get("General", "IdentifierName"))],
         [sg.Column([[sg.OK(), sg.Cancel()]], key="col_final")],
     ]
 
@@ -109,16 +122,17 @@ def main(config_file="settings.ini", loglevel=7):
     # add as comma separated list
     general["IdentifierFound"] = ",".join(unique_identifiers)
 
-    # init the config
-    config = Config(fname=config_file, general=general)
+    config.read_dict({"General": general})
 
     # We start a GUI for each ID
     for i, id_name in enumerate(unique_identifiers):
         # we create sections for all identifiers
+        if id_name not in config.sections():
         config.set_id_section(id_name=id_name)
-
         # the defaults come either from the first section or from the last that we set
         defaults = config[id_name] if i == 0 else config[unique_identifiers[i - 1]]
+        else:
+            defaults = config[id_name]
 
         # Common elements of the next GUI part
         workflow = [
