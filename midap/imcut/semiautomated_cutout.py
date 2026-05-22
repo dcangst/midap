@@ -72,16 +72,17 @@ class SemiAutomatedCutout(CutoutImage):
         self._pool = None
         self._img = None
 
-    def cut_corners(self, img):
+    def cut_corners(self, img, corners = None):
         """
         Given a single aligned image as array, it defines the corners that are used to cut out all images
         :param img: Image to cut as array
+        :param corners: Predefined corners for the cutout, if existing.
         :returns: The corners of the cutout as tuple (left_x, right_x, lower_y, upper_y), where full range of the
                   image, i.e. the limits of the corners, are given by the total number of pixels.
         """
 
         # interactive cutout of chambers
-        corners = self.interactive_cutout(img)
+        corners = self.interactive_cutout(img, corners)
         self.corners_cut = tuple([int(i) for i in corners])
 
     def get_offsets(self, x1, x2, y1, y2, max_width=100):
@@ -117,16 +118,8 @@ class SemiAutomatedCutout(CutoutImage):
         offsets = offsets[offsets > -x_dim // 2]
 
         return offsets
-
-    def line_select_callback(self, eclick, erelease):
-        """
-        Line select callback for the RectangleSelector of the <interactive_cutout> routine
-        :param eclick: Press event of the mouse
-        :param erelease: Release event of the mouse
-        """
-        x1, y1 = eclick.xdata, eclick.ydata
-        x2, y2 = erelease.xdata, erelease.ydata
-
+    
+    def line_select(self, x1, y1, x2, y2):
         # update the plot on the right
         self.ax[1].cla()
         self.ax[1].imshow(self._interactive_img)
@@ -158,10 +151,22 @@ class SemiAutomatedCutout(CutoutImage):
 
         plt.draw()
 
-    def interactive_cutout(self, img):
+    def line_select_callback(self, eclick, erelease):
+        """
+        Line select callback for the RectangleSelector of the <interactive_cutout> routine
+        :param eclick: Press event of the mouse
+        :param erelease: Release event of the mouse
+        """
+        x1, y1 = eclick.xdata, eclick.ydata
+        x2, y2 = erelease.xdata, erelease.ydata
+
+        self.line_select(x1, y1, x2, y2)
+
+    def interactive_cutout(self, img, corners = None):
         """
         Generates an interactive plot to select the borders of the chamber
         :param img: The image for the plot as array
+        :param corners: Predefined corners for the cutout, if existing.
         :returns: The corners as (left_x, right_x, lower_y, upper_y)
         """
 
@@ -185,20 +190,20 @@ class SemiAutomatedCutout(CutoutImage):
             spancoords="pixels",
             interactive=True,
         )
-        x1, x2, y1, y2 = (
-            img.shape[0] // 4,
-            3 * img.shape[0] // 4,
-            img.shape[1] // 4,
-            3 * img.shape[1] // 4,
-        )
+
+        if corners is None:
+            x1, x2, y1, y2 = (
+                img.shape[0] // 4,
+                3 * img.shape[0] // 4,
+                img.shape[1] // 4,
+                2 * img.shape[1] // 4,
+            )
+        else:
+            x1, x2, y1, y2 = corners
         rs.extents = (x1, x2, y1, y2)
 
-        # show the zoom
-        self.ax[1].imshow(img)
-        self.ax[1].set_title("Current Selection:")
-        self.ax[1].set_xticks([])
-        self.ax[1].set_yticks([])
-        self.ax[1].set_ylim(y2, y1)
+        self.line_select(x1, y1, x2, y2)
+        
         plt.show()
 
         # close the pool and extract the corners
@@ -208,7 +213,7 @@ class SemiAutomatedCutout(CutoutImage):
 
         return left_x, right_x, lower_y, upper_y
 
-    def run_align_cutout(self, registration: bool = True):
+    def run_align_cutout(self, registration: bool = True, force: bool = False):
         """
         Aligns and cut out all images from all channels
         :param registration: If True, compute cross-image registration from the first channel and apply
@@ -236,7 +241,10 @@ class SemiAutomatedCutout(CutoutImage):
             # We cut the corners if the corners_cut is None
             if self.corners_cut is None or self.offsets is None:
                 # set the corner to cut
-                self.cut_corners(img=src)
+                self.cut_corners(img=src, corners=self.corners_cut)
+            elif force:
+                self.logger.info("Redoing cutout...")
+                self.cut_corners(img=src, corners=self.corners_cut)
 
             # cut out all chambers sequentially
             for chamber in range(0, len(self.offsets)):

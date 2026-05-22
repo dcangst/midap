@@ -146,7 +146,7 @@ class CutoutImage(ABC):
 
                 io.imsave(f_path, i, check_contrast=False)
 
-    def run_align_cutout(self, registration: bool = True):
+    def run_align_cutout(self, registration: bool = True, force: bool = False):
         """
         Aligns and cut out all images from all channels
         :param registration: If True, compute cross-image registration from the first channel and apply
@@ -174,10 +174,13 @@ class CutoutImage(ABC):
             # get the first image
             src = io.imread(files[0])
 
-            # We cut the corners if the corners_cut is None
+            # We cut the corners if the corners_cut is None or if force is True
             if self.corners_cut is None:
                 # set the corner to cut
-                self.cut_corners(img=src)
+                self.cut_corners(img=src, corners=self.corners_cut)
+            elif force:
+                self.logger.info("Redoing cutout...")
+                self.cut_corners(img=src, corners=self.corners_cut)
 
             # perform the cutout of the first image
             cutout = self.do_cutout(src, self.corners_cut)
@@ -211,7 +214,7 @@ class CutoutImage(ABC):
             self.save_cutout(aligned_cutouts, files, normalization=False)
 
     @abstractmethod
-    def cut_corners(self, img):
+    def cut_corners(self, img, corners = None):
         """
         This is an abstract method forcing subclasses to implement it
         """

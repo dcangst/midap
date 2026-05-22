@@ -17,6 +17,7 @@ def main(
     corners: Optional[tuple] = None,
     offsets: Optional[list] = None,
     registration: bool = True,
+    force: bool = False,
 ) -> tuple[tuple, Optional[list]]:
     """
     Performs the image cutout and alignment on all images in the paths
@@ -25,6 +26,9 @@ def main(
                          midap.imcut and a subclass of midap.imcut.base_cutout.CutoutImage
     :param registration: If True, perform cross-image registration using the first channel. If False,
                          use static corners (no phase channel required).
+    :param corners: Previously defined corners for the cutout, if existing.
+    :param offsets: Previously defined offsets for the cutout, if existing.
+    :param force: If True, perform the cutout even if it has been done previously. This will overwrite existing cutouts.
     """
     # get the right subclass
     class_instance = None
@@ -43,7 +47,7 @@ def main(
         )
     
     cut = class_instance(channel, corners=corners, offsets=offsets)
-    cut.run_align_cutout(registration=registration)
+    cut.run_align_cutout(registration=registration, force=force)
 
     return cut.corners_cut, cut.offsets
 
@@ -64,6 +68,11 @@ if __name__ == "__main__":
         required=True,
         help="Name of the class used to perform the chamber cutout. Must be defined in a file of "
         "midap.imcut and a subclass of midap.imcut.base_cutout.CutoutImage",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force cutting of images, even if done previously",
     )
     args = parser.parse_args()
 

@@ -166,12 +166,8 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                 ]
 
                 # Do the init cutouts
-                if (
-                    config.get(identifier, "Corners") == "None"
-                    or config.get(identifier, "Offsets") == "None"
-                ):
+                if config.get(identifier, "Corners") == "None":
                     corners = None
-                    offsets = None
                 else:
                     corners = tuple(
                         [
@@ -179,19 +175,26 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                             for corner in config.getlist(identifier, "Corners")
                         ]
                     )
+
+                if config.get(identifier, "Offsets") == "None":
+                    offsets = None
+                else:
                     offsets = list(
                         [
                             int(offset)
                             for offset in config.getlist(identifier, "Offsets")
                         ]
                     )
-                registration = config.getboolean(identifier, "Registration", fallback=True)
+                registration = config.getboolean(
+                    identifier, "Registration", fallback=True
+                )
                 cut_corners, offsets = cut_chamber.main(
                     channel=paths,
                     cutout_class=config.get(identifier, "CutImgClass"),
                     corners=corners,
                     offsets=offsets,
                     registration=registration,
+                    force=config.getboolean(identifier, "ForceCut", fallback=False),
                 )
 
                 # save the corners if necessary

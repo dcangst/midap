@@ -128,9 +128,9 @@ def main(config_file="settings.ini", loglevel=7):
     for i, id_name in enumerate(unique_identifiers):
         # we create sections for all identifiers
         if id_name not in config.sections():
-        config.set_id_section(id_name=id_name)
-        # the defaults come either from the first section or from the last that we set
-        defaults = config[id_name] if i == 0 else config[unique_identifiers[i - 1]]
+            config.set_id_section(id_name=id_name)
+            # the defaults come either from the first section or from the last that we set
+            defaults = config[id_name] if i == 0 else config[unique_identifiers[i - 1]]
         else:
             defaults = config[id_name]
 
@@ -373,6 +373,12 @@ def main(config_file="settings.ini", loglevel=7):
                     key="imcut",
                     values=imcut_subclasses,
                     default_value=defaults["CutImgClass"],
+                ),
+                sg.Checkbox(
+                    "Redo",
+                    key="ForceCut",
+                    font="bold",
+                    default=defaults.getboolean("ForceCut",fallback="False"),
                 )
             ],
             [
@@ -494,6 +500,8 @@ def main(config_file="settings.ini", loglevel=7):
         section["CutImgClass"] = values["imcut"]
         section["SegmentationClass"] = values["seg_method"]
         section["TrackingClass"] = values["track_method"]
+
+        section["ForceCut"] = values["ForceCut"]
 
         # The advanced options
         section["KeepCopyOriginal"] = values["keep_copy"]

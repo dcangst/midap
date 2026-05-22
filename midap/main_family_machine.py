@@ -195,6 +195,7 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
                     cutout_class=config.get(identifier, "CutImgClass"),
                     corners=corners,
                     registration=registration,
+                    force=config.getboolean(identifier, "ForceCut", fallback=False),
                 )
 
                 # save the corners if necessary

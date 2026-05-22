@@ -23,17 +23,24 @@ class InteractiveCutout(CutoutImage):
         # init the super class
         super().__init__(*args, **kwargs)
 
-    def cut_corners(self, img):
+    def cut_corners(self, img, corners = None):
         """
         Given a single aligned image as array, it defines the corners that are used to cut out all images
         :param img: Image to cut as array
+        :param corners: Predefined corners for the cutout, if existing.
         :returns: The corners of the cutout as tuple (left_x, right_x, lower_y, upper_y), where full range of the
                   image, i.e. the limits of the corners, are given by the total number of pixels.
         """
 
         # interactive cutout of chambers
-        corners = self.interactive_cutout(img)
+        corners = self.interactive_cutout(img, corners)
         self.corners_cut = tuple([int(i) for i in corners])
+
+    def line_select(self, x1, y1, x2, y2):
+        self.ax[1].set_xlim(x1, x2)
+        self.ax[1].set_ylim(y2, y1)
+        self.ax[1].relim()
+        plt.draw()
 
     def line_select_callback(self, eclick, erelease):
         """
@@ -45,15 +52,13 @@ class InteractiveCutout(CutoutImage):
         x2, y2 = erelease.xdata, erelease.ydata
 
         # update the plot on the right
-        self.ax[1].set_xlim(x1, x2)
-        self.ax[1].set_ylim(y2, y1)
-        self.ax[1].relim()
-        plt.draw()
+        self.line_select(x1, y1, x2, y2)
 
-    def interactive_cutout(self, img):
+    def interactive_cutout(self, img, corners = None):
         """
         Generates an interactive plot to select the borders of the chamber
         :param img: The image for the plot as array
+        :param corners: Predefined corners for the cutout, if existing.
         :returns: The corners as (left_x, right_x, lower_y, upper_y)
         """
 
@@ -73,12 +78,15 @@ class InteractiveCutout(CutoutImage):
             spancoords="pixels",
             interactive=True,
         )
-        x1, x2, y1, y2 = (
-            img.shape[0] // 4,
-            3 * img.shape[0] // 4,
-            img.shape[1] // 4,
-            3 * img.shape[1] // 4,
-        )
+        if corners is None:
+            x1, x2, y1, y2 = (
+                img.shape[0] // 4,
+                3 * img.shape[0] // 4,
+                img.shape[1] // 4,
+                3 * img.shape[1] // 4,
+            )
+        else:
+            x1, x2, y1, y2 = corners
         rs.extents = (x1, x2, y1, y2)
 
         # show the zoom
@@ -86,8 +94,7 @@ class InteractiveCutout(CutoutImage):
         self.ax[1].set_title("Current Selection:")
         self.ax[1].set_xticks([])
         self.ax[1].set_yticks([])
-        self.ax[1].set_xlim(x1, x2)
-        self.ax[1].set_ylim(y2, y1)
+        self.line_select(x1, y1, x2, y2)
         plt.show()
 
         left_x, right_x = rs.corners[0][:2]
