@@ -89,9 +89,9 @@ class Config(ConfigParser):
                     "Timestamp": datetime.now().strftime("%Y-%m-%d, %H:%M:%S"),
                     "Git hash": sha,
                     "DataType": "Family_Machine",
-                    "FolderPath": "None",
-                    "FileType": "tif",
-                    "IdentifierName": "pos",
+                    "FolderPath": ".",
+                    "FileType": "",
+                    "IdentifierName": "",
                     "IdentifierFound": "None",
                 }
             }
