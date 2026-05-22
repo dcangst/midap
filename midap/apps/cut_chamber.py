@@ -17,7 +17,7 @@ def main(
     corners: Optional[tuple] = None,
     offsets: Optional[list] = None,
     registration: bool = True,
-):
+) -> tuple[tuple, Optional[list]]:
     """
     Performs the image cutout and alignment on all images in the paths
     :param channel: A single directory or a list of directories with the images to cut and align
@@ -41,21 +41,11 @@ def main(
         raise ValueError(
             f"Cutout class {cutout_class} supports more than one machine type!"
         )
-    if "Family_Machine" in class_instance.supported_setups:
-        cut = class_instance(channel)
-        if corners is not None:
-            cut.corners_cut = corners
-        cut.run_align_cutout(registration=registration)
+    
+    cut = class_instance(channel, corners=corners, offsets=offsets)
+    cut.run_align_cutout(registration=registration)
 
-        return cut.corners_cut
-    elif "Mother_Machine" in class_instance.supported_setups:
-        cut = class_instance(channel)
-        if corners is not None and offsets is not None:
-            cut.corners_cut = corners
-            cut.offsets = offsets
-        cut.run_align_cutout_mother_machine(registration=registration)
-
-        return cut.corners_cut, cut.offsets
+    return cut.corners_cut, cut.offsets
 
 
 # run as main

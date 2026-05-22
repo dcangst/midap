@@ -369,7 +369,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                     [int(offset) for offset in config.getlist(identifier, "Offsets")]
                 )
                 registration = config.getboolean(identifier, "Registration", fallback=True)
-                _ = cut_chamber.main(
+                _, _ = cut_chamber.main(
                     channel=paths,
                     cutout_class=config.get(identifier, "CutImgClass"),
                     corners=corners,

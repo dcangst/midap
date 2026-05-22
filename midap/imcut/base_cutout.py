@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Iterable, Union
+from typing import Iterable, Union, Optional
 
 import numpy as np
 import skimage.io as io
@@ -28,6 +28,8 @@ class CutoutImage(ABC):
     def __init__(
         self,
         paths: Union[str, bytes, os.PathLike, Iterable[Union[str, bytes, os.PathLike]]],
+        corners: Optional[tuple] = None,
+        offsets: Optional[list] = None,
     ):
         """
         Initializes the class
@@ -40,9 +42,8 @@ class CutoutImage(ABC):
         else:
             self.paths = paths
 
-        # this should be set by the cut_corners routine
-        self.corners_cut = None
-        self.offsets = None
+        self.corners_cut = corners
+        self.offsets = offsets
 
         # get the file lists
         self.channels = [

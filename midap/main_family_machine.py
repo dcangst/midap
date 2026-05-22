@@ -190,7 +190,7 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
                         ]
                     )
                 registration = config.getboolean(identifier, "Registration", fallback=True)
-                cut_corners = cut_chamber.main(
+                cut_corners, _ = cut_chamber.main(
                     channel=paths,
                     cutout_class=config.get(identifier, "CutImgClass"),
                     corners=corners,
@@ -368,7 +368,7 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
                     [int(corner) for corner in config.getlist(identifier, "Corners")]
                 )
                 registration = config.getboolean(identifier, "Registration", fallback=True)
-                _ = cut_chamber.main(
+                _, _ = cut_chamber.main(
                     channel=paths,
                     cutout_class=config.get(identifier, "CutImgClass"),
                     corners=corners,

@@ -208,7 +208,7 @@ class SemiAutomatedCutout(CutoutImage):
 
         return left_x, right_x, lower_y, upper_y
 
-    def run_align_cutout_mother_machine(self, registration: bool = True):
+    def run_align_cutout(self, registration: bool = True):
         """
         Aligns and cut out all images from all channels
         :param registration: If True, compute cross-image registration from the first channel and apply
