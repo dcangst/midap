@@ -39,9 +39,12 @@ class SemiAutomatedCutoutSelect(SemiAutomatedCutout):
         self.logger.info("Selecting Chambers to include")
         self.logger.info(f"All offset idx: {list(range(len(self.offsets)))}")
         selected_offsets_idx = []
+
         chunk_size = 12
-        n_chunks = len(self.offsets) // chunk_size + 1
-        i_chunk = 0
+        n_whole_chunks = len(self.offsets) // chunk_size
+        n_chunks = n_whole_chunks + (1 if len(self.offsets) % chunk_size > 0 else 0)
+        i_chunk = 1
+
         for batch in _chunked(list(enumerate(self.offsets)), chunk_size):
             figures = []
             indices = []
