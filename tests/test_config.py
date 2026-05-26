@@ -41,12 +41,13 @@ def test_Config(tmp_dir):
     # -----------------------------------
 
     # get the class
-    config = Config(fname="settings.ini", general={"foo": "bar"})
+    config = Config(fname="settings.ini", general={"foo": "bar", "FolderPath": "DoesNotExist"})
 
     # check if we have the correct extra setting
     assert config.get("General", "foo") == "bar"
+    assert config.get("General", "FolderPath") == "DoesNotExist"
 
-    # the default folder path does not exists
+    # the folder path shouldn't not exists
     with pytest.raises(FileNotFoundError):
         config.validate_general()
 

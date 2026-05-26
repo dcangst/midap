@@ -90,8 +90,8 @@ class Config(ConfigParser):
                     "Git hash": sha,
                     "DataType": "Family_Machine",
                     "FolderPath": ".",
-                    "FileType": "",
-                    "IdentifierName": "",
+                    "FileType": "tif",
+                    "IdentifierName": "pos",
                     "IdentifierFound": "None",
                 }
             }
