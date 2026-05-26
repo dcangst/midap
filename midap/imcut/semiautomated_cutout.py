@@ -242,7 +242,8 @@ class SemiAutomatedCutout(CutoutImage):
             if self.corners_cut is None or self.offsets is None:
                 # set the corner to cut
                 self.cut_corners(img=src, corners=self.corners_cut)
-            elif force:
+            # redoing, only for the first channel (always Phase), as the corners are the same for all channels
+            elif force and channel_id == 0:
                 self.logger.info("Redoing cutout...")
                 self.cut_corners(img=src, corners=self.corners_cut)
 
