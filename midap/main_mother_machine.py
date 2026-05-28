@@ -243,6 +243,10 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                         path_model_weights = Path(__file__).parent.parent.joinpath(
                             "model_weights", "model_weights_mother_machine"
                         )
+                    elif segmentation_class == "CellposeSAMSegmentation":
+                        path_model_weights = Path(__file__).parent.parent.joinpath(
+                            "model_weights", "model_weights_cellpose_sam"
+                        )
                     else:
                         raise ValueError(
                             f"Unknown segmentation class {segmentation_class}"
@@ -368,6 +372,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                 offsets = list(
                     [int(offset) for offset in config.getlist(identifier, "Offsets")]
                 )
+                logger.info(f"corners {corners}, offsets {offsets}")
                 registration = config.getboolean(identifier, "Registration", fallback=True)
                 _ = cut_chamber.main(
                     channel=paths,
