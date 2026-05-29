@@ -20,7 +20,14 @@ class CellposeSAMSegmentation(SegmentationPredictor):
 
     supported_setups = ["Family_Machine", "Mother_Machine"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        *args,
+        flow_threshold: float,
+        cellprob_threshold: float,
+        tile_norm_blocksize: float,
+        **kwargs,
+    ):
         """
         Initializes the CellposeSAMSegmentation using the base class init
         :*args: Arguments used for the base class init
@@ -29,6 +36,13 @@ class CellposeSAMSegmentation(SegmentationPredictor):
 
         # base class init
         super().__init__(*args, **kwargs)
+        self.flow_threshold = flow_threshold
+        self.cellprob_threshold = cellprob_threshold
+        self.tile_norm_blocksize = tile_norm_blocksize
+
+        self.logger.debug(f"flow_threshold: {self.flow_threshold}")
+        self.logger.debug(f"cellprob_threshold: {self.cellprob_threshold}")
+        self.logger.debug(f"tile_norm_blocksize: {self.tile_norm_blocksize}")
 
         if platform.processor() == "arm":
             self.gpu_available = torch.mps.is_available()
@@ -90,8 +104,9 @@ class CellposeSAMSegmentation(SegmentationPredictor):
                     mask, _, _ = model.eval(
                         img,
                         diameter=None,
-                        flow_threshold=0.4,
-                        cellprob_threshold=0.0,
+                        flow_threshold=self.flow_threshold,
+                        cellprob_threshold=self.cellprob_threshold,
+                        normalize={"tile_norm_blocksize": self.tile_norm_blocksize},
                     )
                     seg = (mask > 0).astype(int)
                 except Exception as e:
@@ -146,8 +161,9 @@ class CellposeSAMSegmentation(SegmentationPredictor):
                 mask_list, _, _ = model.eval(
                     imgs,
                     diameter=None,
-                    flow_threshold=0.4,
-                    cellprob_threshold=0.0,
+                    flow_threshold=self.flow_threshold,
+                    cellprob_threshold=self.cellprob_threshold,
+                    normalize={"tile_norm_blocksize": self.tile_norm_blocksize},
                 )
             except Exception:
                 self.logger.warning("Segmentation failed, returning empty masks!")
