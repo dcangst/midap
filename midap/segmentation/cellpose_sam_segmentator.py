@@ -71,11 +71,8 @@ class CellposeSAMSegmentation(SegmentationPredictor):
 
             path_img = list_files[ix_half]
 
-            # scale the image for display
-            img = self.scale_pixel_vals(
-                io.imread(os.path.join(path_to_cutouts, path_img))
-            )
-
+            img = io.imread(os.path.join(path_to_cutouts, path_img))
+           
             # built-in cpsam model plus any custom models from path_model_weights
             label_dict = {"cpsam": "cpsam"}
             for custom_model in self._iter_model_weights():
@@ -154,8 +151,6 @@ class CellposeSAMSegmentation(SegmentationPredictor):
             )
 
         def seg_method(imgs):
-            # scale all images before passing to the model
-            imgs = [self.scale_pixel_vals(img) for img in imgs]
             # cellpose v4 returns a list of masks when given a list of images
             try:
                 mask_list, _, _ = model.eval(
