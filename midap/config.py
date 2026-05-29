@@ -340,6 +340,27 @@ class Config(ConfigParser):
         """
 
         return self.get(section=section, option=option).split(",")
+    
+    def get_section_dict(self, section: str) -> dict:
+        """
+        Return the requested section as a dictionary, i.e. transform from config section to dict
+        :param section: The section of the parameter
+        :return: A dictionary of strings that was generated from the section or an empty dict if the section does not exist
+        """
+        if not self.has_section(section):
+            return {}
+        return dict(self.items(section))
+
+    def get_segmentation_class_options(self, identifier: str) -> dict:
+        """
+        Get the options relevant for the segmentation class of an identifier as a dictionary
+        :param identifier: The identifier for which to get the options
+        :return: A dictionary with the options relevant for the segmentation class of the identifier
+        """
+
+        options = {key: float(value) for key, value in self.get_section_dict(f"{identifier}.SegmentationClassOptions").items()}
+
+        return options
 
     def to_file(
         self, fname: Union[str, bytes, os.PathLike, None] = None, overwrite=True

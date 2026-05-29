@@ -234,6 +234,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
 
                     # run the selector
                     segmentation_class = config.get(identifier, "SegmentationClass")
+                    segmentation_class_options = config.get_segmentation_class_options(identifier)
                     if segmentation_class == "OmniSegmentation":
                         path_model_weights = Path(__file__).parent.parent.joinpath(
                             "model_weights", "model_weights_omni"
@@ -267,6 +268,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                         segmentation_class=segmentation_class,
                         just_select=True,
                         img_threshold=config.getfloat(identifier, "ImgThreshold"),
+                        **segmentation_class_options
                     )
 
                     # save to config
@@ -415,6 +417,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                         model_weights = config.get(
                             identifier, f"ModelWeights_{channel}"
                         )
+                        segmentation_class_options = config.get_segmentation_class_options(identifier)
 
                         # run the segmentation, the actual path to the weights does not matter anymore since it is selected
                         path_model_weights = Path(__file__).parent.parent.joinpath(
@@ -432,6 +435,7 @@ def run_mother_machine(config, checkpoint, main_args, logger, restart=False, con
                                 identifier, "SegmentationClass"
                             ),
                             img_threshold=config.getfloat(identifier, "ImgThreshold"),
+                            **segmentation_class_options
                         )
                         # analyse the images
                         segment_analysis.main(
