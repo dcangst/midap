@@ -23,6 +23,7 @@ def main(
     network_name: Union[str, bytes, os.PathLike, None] = None,
     just_select=False,
     img_threshold=1.0,
+    **segmentation_class_options,
 ):
     """
     Performs cell segmentation on all images in a given directory
@@ -55,6 +56,7 @@ def main(
         postprocessing=postprocessing,
         model_weights=network_name,
         img_threshold=img_threshold,
+        **segmentation_class_options
     )
 
     # set the paths
