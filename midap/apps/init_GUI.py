@@ -368,7 +368,7 @@ def main(config_file="settings.ini", loglevel=7):
             segmentation_subclasses = MOTHER_SEG_CLS
 
         # Specific layout
-        layout_family_machine = [
+        layout_position = [
             [
                 sg.Frame(
                     "Conditional Run",
@@ -475,7 +475,7 @@ def main(config_file="settings.ini", loglevel=7):
         # Finalize the layout
         window = sg.Window(
             f"Params for '{id_name}' of {unique_identifiers}",
-            layout_family_machine,
+            layout_position,
             size=(600, 1000),
         ).Finalize()
 
