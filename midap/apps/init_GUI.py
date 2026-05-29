@@ -131,9 +131,10 @@ def main(config_file="settings.ini", loglevel=7):
             config.set_id_section(id_name=id_name)
             # the defaults come either from the first section or from the last that we set
             defaults = config[id_name] if i == 0 else config[unique_identifiers[i - 1]]
+            default_segmentation_class_options = config.get_section_dict(f"{unique_identifiers[i - 1]}.SegmentationClassOptions")
         else:
             defaults = config[id_name]
-
+            default_segmentation_class_options = config.get_section_dict(f"{id_name}.SegmentationClassOptions")
         # Common elements of the next GUI part
         workflow = [
             [sg.Text("Part of pipeline", justification="center", size=(16, 1))],
@@ -312,6 +313,49 @@ def main(config_file="settings.ini", loglevel=7):
                         default=defaults.getboolean("FluoChange"),
                         size=30,
                     )
+                ],
+            ]
+
+        advanced_options += [
+            [sg.Text("Cellpose-SAM options", font="bold")],
+            [
+                sg.Text("Flow threshold: ", font="bold"),
+                sg.Input(
+                    default_text=default_segmentation_class_options.get(
+                        "flow_threshold", "0.4"
+                    ),
+                    size=10,
+                    key="flow_threshold",
+                    tooltip="maximum allowed error of the flows for each mask.\n"
+                    + "Increase this threshold if cellpose is not returning as many masks as you'd expect (or turn off completely with 0.0).\n"
+                    + "Decrease this threshold if cellpose is returning too many ill-shaped masks.",
+                ),
+            ],
+            [
+                sg.Text("Cellprob threshold: ", font="bold"),
+                sg.Input(
+                    default_text=default_segmentation_class_options.get(
+                        "cellprob_threshold", "0"
+                    ),
+                    size=10,
+                    key="cellprob_threshold",
+                    tooltip="determines proability that a detected object is a cell.\n"
+                    + "Decrease this threshold if cellpose is not returning as many masks as you'd expect or if masks are too small.\n"
+                    + "Increase this threshold if cellpose is returning too many masks esp from dull/dim areas.",
+                ),
+            ],
+            [
+                sg.Text("Tile norm blocksize: ", font="bold"),
+                sg.Input(
+                    default_text=default_segmentation_class_options.get(
+                        "tile_norm_blocksize", "0"
+                    ),
+                    size=10,
+                    key="tile_norm_blocksize",
+                    tooltip="determines the size of blocks used for normalizing the image.\n"
+                    + "The default is 0, which means the entire image is normalized together.\n"
+                    + "You may want to change this to 100-200 pixels if you have very inhomogeneous brightness across your image.",
+                ),
                 ],
             ]
 
@@ -531,6 +575,14 @@ def main(config_file="settings.ini", loglevel=7):
 
         # overwrite the section defaults
         config.read_dict({id_name: section})
+
+        if values["seg_method"] == "CellposeSAMSegmentation":
+            segmentation_class_options = {
+                "flow_threshold": float(values["flow_threshold"]),
+                "cellprob_threshold": float(values["cellprob_threshold"]),
+                "tile_norm_blocksize": float(values["tile_norm_blocksize"]),
+            }
+            config.read_dict({f"{id_name}.SegmentationClassOptions": segmentation_class_options})
 
     # write to file
     config.to_file(config_file, overwrite=True)
