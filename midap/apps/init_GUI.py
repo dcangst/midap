@@ -19,7 +19,8 @@ def collapse(layout, key):
     """
 
     # sg.pin allows us to diplay or hide the column
-    return sg.pin(sg.Column(layout, key=key))
+    return sg.pin(sg.Column(layout, key=key, scrollable=True,
+    vertical_scroll_only=True))
 
 
 # main function of the App
@@ -356,8 +357,8 @@ def main(config_file="settings.ini", loglevel=7):
                     + "The default is 0, which means the entire image is normalized together.\n"
                     + "You may want to change this to 100-200 pixels if you have very inhomogeneous brightness across your image.",
                 ),
-                ],
-            ]
+            ],
+        ]
 
         # get the vars for the specific layout
         if general["DataType"] == "Family_Machine":
@@ -477,6 +478,7 @@ def main(config_file="settings.ini", loglevel=7):
             f"Params for '{id_name}' of {unique_identifiers}",
             layout_position,
             size=(600, 1000),
+            resizable=True,
         ).Finalize()
 
         # Set the advanced options to be collapsed
