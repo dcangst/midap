@@ -20,6 +20,16 @@ class OmniSegmentation(SegmentationPredictor):
 
     supported_setups = ["Family_Machine", "Mother_Machine"]
 
+    @property
+    def included_model_weights_folder(self):
+        """
+        Returns the folder in which the included model weights for this segmentator are stored.
+        """
+        return {
+            "Family_Machine": "model_weights_omni",
+            "Mother_Machine": "model_weights_omni",
+        }[self.data_type]
+
     def __init__(self, *args, **kwargs):
         """
         Initializes the UNetSegmentation using the base class init
@@ -68,9 +78,13 @@ class OmniSegmentation(SegmentationPredictor):
                 "bact_phase_omni": "bact_phase_omni",
                 "bact_fluor_omni": "bact_fluor_omni",
             }
-            for custom_model in self._iter_model_weights():
-                    if custom_model.is_file() and custom_model.suffix == "" and not custom_model.name.startswith("."): # Filter out any other files that contain no weights (i.e .jsons)
-                        label_dict.update({custom_model.name: custom_model})
+            for custom_model in self.iter_model_weights():
+                if (
+                    custom_model.is_file()
+                    and custom_model.suffix == ""
+                    and not custom_model.name.startswith(".")
+                ):  # Filter out any other files that contain no weights (i.e .jsons)
+                    label_dict.update({custom_model.name: custom_model})
             figures = []
             for model_name, model_path in label_dict.items():
                 self.logger.info("Try model: " + str(model_name))

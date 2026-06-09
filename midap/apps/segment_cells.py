@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from typing import Union
+from typing import Union, Sequence
 from pathlib import Path
 
 # to get all subclasses
@@ -12,11 +12,12 @@ from midap.utils import get_inheritors
 ### Functions
 #############
 
-
+    
 def main(
-    path_model_weights: Union[str, bytes, os.PathLike],
-    path_pos: Union[str, bytes, os.PathLike],
-    path_channel: str,
+    data_type: str,
+    path_model_weights: Sequence[str | os.PathLike],
+    path_pos: str | os.PathLike,
+    path_channel: str | os.PathLike,
     segmentation_class: str,
     postprocessing: bool,
     clean_border: bool,
@@ -27,6 +28,7 @@ def main(
 ):
     """
     Performs cell segmentation on all images in a given directory
+    :param data_type: The type of the data, i.e. "Mother_Machine" or "Family_Machine"
     :param path_model_weights: The path to the pretrained model weights
     :param path_pos: The path to the current identifier, the base directory for all data
     :param path_channel: The name of the current channel
@@ -52,6 +54,7 @@ def main(
 
     # get the Predictor
     pred = class_instance(
+        data_type=data_type,
         path_model_weights=path_model_weights,
         postprocessing=postprocessing,
         model_weights=network_name,

@@ -1,8 +1,9 @@
 import os
 import re
 from abc import ABC, abstractmethod
+from itertools import chain
 from pathlib import Path
-from typing import Union
+from typing import Union, Sequence
 
 import numpy as np
 import skimage.io as io
@@ -28,17 +29,36 @@ class SegmentationPredictor(ABC):
     # this logger will be shared by all instances and subclasses
     logger = logger
 
+    @property
+    @abstractmethod
+    def supported_setups(self) -> list[str]:
+        """
+        Returns the list of supported setups for this segmentator.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def included_model_weights_folder(self) -> str:
+        """
+        Returns the folder in which the included model weights for this segmentator are stored.
+        This is an abstract property forcing subclasses to implement it
+        """
+        pass
+
     def __init__(
         self,
-        path_model_weights: Union[str, bytes, os.PathLike],
+        data_type: str,
+        path_model_weights: Sequence[Union[str, os.PathLike]],
         postprocessing: bool,
         div=16,
         connectivity=1,
-        model_weights: Union[str, bytes, os.PathLike, None] = None,
+        model_weights: Union[str, os.PathLike, None] = None,
         img_threshold=1.0,
     ):
         """
         Initializes the SegmentationPredictor instance
+        :param data_type: The type of the data, i.e. "Mother_Machine" or "Family_Machine"
         :param path_model_weights: Path to the model weights
         :param postprocessing: A flag for the postprocessing
         :param div: Divisor used for the padding of the images. Images will be padded to next higher number that is
@@ -50,6 +70,12 @@ class SegmentationPredictor(ABC):
         """
 
         # set the params
+        if data_type not in self.supported_setups:
+            raise ValueError(
+                f"Data type {data_type} not supported for {self.__class__.__name__}. Supported types are: {self.supported_setups}"
+            )
+
+        self.data_type = data_type
         self.path_model_weights = path_model_weights
         self.postprocessing = postprocessing
         self.div = div
@@ -155,17 +181,22 @@ class SegmentationPredictor(ABC):
         img = np.clip(img, img.min(), self.threshold * img.max())
         return (img - img.min()) / (img.max() - img.min())
 
-    def _iter_model_weights(self):
+    def iter_model_weights(self):
         """
-        Returns an iterator over the model weights directory. If the directory does not exist
+        Returns an iterator over the model weights directories. If a directory does not exist
         (e.g. no custom weights are shipped for this segmentor), returns an empty iterator
         instead of raising FileNotFoundError.
         :returns: An iterator over Path objects in self.path_model_weights, or an empty iterator
         """
-        weights_path = Path(self.path_model_weights)
-        if not weights_path.exists():
-            return iter([])
-        return weights_path.iterdir()
+        path_model_weights_folder = [
+            Path(p) / self.included_model_weights_folder
+            for p in self.path_model_weights
+            if p is not None
+        ]
+        weights_paths_iterators = [
+            p.iterdir() if p.exists() else iter([]) for p in path_model_weights_folder
+        ]
+        return chain(*weights_paths_iterators)
 
     @abstractmethod
     def set_segmentation_method(self, path_to_cutouts):

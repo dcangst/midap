@@ -16,6 +16,7 @@ class OmniSegmentationJupyter(OmniSegmentation):
     """
 
     supported_setups = ["Jupyter"]
+    included_model_weights_folder = "model_weights_omni"
 
     def __init__(self, *args, **kwargs):
         """
@@ -26,7 +27,6 @@ class OmniSegmentationJupyter(OmniSegmentation):
 
         # base class init
         super().__init__(*args, **kwargs)
-
     
     def set_segmentation_method_jupyter_all_imgs(self, path_to_cutouts: Union[str, bytes, os.PathLike]):
         """
@@ -53,7 +53,7 @@ class OmniSegmentationJupyter(OmniSegmentation):
                           'bact_fluor_cp': 'bact_fluor_cp',
                           'bact_phase_omni': 'bact_phase_omni',
                           'bact_fluor_omni': 'bact_fluor_omni',}
-            for custom_model in self._iter_model_weights():
+            for custom_model in self.iter_model_weights():
                 label_dict.update({custom_model.name: custom_model})
 
             self.all_segs_label = {}

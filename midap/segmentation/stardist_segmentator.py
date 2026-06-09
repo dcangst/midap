@@ -18,6 +18,16 @@ class StarDistSegmentation(SegmentationPredictor):
 
     supported_setups = ["Family_Machine", "Mother_Machine"]
 
+    @property
+    def included_model_weights_folder(self):
+        """
+        Returns the folder in which the included model weights for this segmentator are stored.
+        """
+        return {
+            "Family_Machine": "model_weights_stardist",
+            "Mother_Machine": "model_weights_legacy",
+        }[self.data_type]
+
     def __init__(self, *args, **kwargs):
         """
         Initializes the UNetSegmentation using the base class init
@@ -89,7 +99,7 @@ class StarDistSegmentation(SegmentationPredictor):
             # get all trained models
             model_weights = [
                 path
-                for path in self._iter_model_weights()
+                for path in self.iter_model_weights()
                 if path.is_dir()
             ]
             # labels = ['2D_versatile_fluo', '2D_paper_dsb2018', '2D_versatile_he']

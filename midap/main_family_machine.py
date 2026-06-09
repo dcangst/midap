@@ -234,27 +234,12 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
                     # run the selector
                     segmentation_class = config.get(identifier, "SegmentationClass")
                     segmentation_class_options = config.get_segmentation_class_options(identifier)
-                    if segmentation_class == "HybridSegmentation":
-                        path_model_weights = Path(__file__).parent.parent.joinpath(
-                            "model_weights", "model_weights_hybrid"
-                        )
-                    elif segmentation_class == "OmniSegmentation":
-                        path_model_weights = Path(__file__).parent.parent.joinpath(
-                            "model_weights", "model_weights_omni"
-                        )
-                    elif segmentation_class == "StarDistSegmentation":
-                        path_model_weights = Path(__file__).parent.parent.joinpath(
-                            "model_weights", "model_weights_stardist"
-                        )
-                    elif segmentation_class == "CellposeSAMSegmentation":
-                        path_model_weights = Path(__file__).parent.parent.joinpath(
-                            "model_weights", "model_weights_cellpose_sam"
-                        )
-                    else:
-                        path_model_weights = Path(__file__).parent.parent.joinpath(
-                            "model_weights", "model_weights_legacy"
-                        )
+                    path_model_weights = [
+                        Path(__file__).parent.parent.joinpath("model_weights"),
+                        Path(config.get("General", "CustomModelWeights")),
+                    ]
                     weights = segment_cells.main(
+                        data_type=config.get("General", "DataType"),
                         path_model_weights=path_model_weights,
                         path_pos=current_path,
                         path_channel=channel,
@@ -403,10 +388,12 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
                     model_weights = config.get(identifier, f"ModelWeights_{channel}")
                     segmentation_class_options = config.get_segmentation_class_options(identifier)
                     # run the segmentation, the actual path to the weights does not matter anymore since it is selected
-                    path_model_weights = Path(__file__).parent.parent.joinpath(
-                        "model_weights"
-                    )
+                    path_model_weights = [
+                        Path(__file__).parent.parent.joinpath("model_weights"),
+                        Path(config.get("General", "CustomModelWeights")),
+                    ]
                     _ = segment_cells.main(
+                        data_type=config.get("General", "DataType"),
                         path_model_weights=path_model_weights,
                         path_pos=current_path,
                         path_channel=channel,

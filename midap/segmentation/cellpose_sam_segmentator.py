@@ -20,12 +20,22 @@ class CellposeSAMSegmentation(SegmentationPredictor):
 
     supported_setups = ["Family_Machine", "Mother_Machine"]
 
+    @property
+    def included_model_weights_folder(self):
+        """
+        Returns the folder in which the included model weights for this segmentator are stored.
+        """
+        return {
+            "Family_Machine": "model_weights_cellpose_sam",
+            "Mother_Machine": "model_weights_cellpose_sam",
+        }[self.data_type]
+
     def __init__(
         self,
         *args,
-        flow_threshold: float,
-        cellprob_threshold: float,
-        tile_norm_blocksize: float,
+        flow_threshold: float = 0.4,
+        cellprob_threshold: float = 0.0,
+        tile_norm_blocksize: float = 0.0,
         **kwargs,
     ):
         """
@@ -75,7 +85,7 @@ class CellposeSAMSegmentation(SegmentationPredictor):
            
             # built-in cpsam model plus any custom models from path_model_weights
             label_dict = {"cpsam": "cpsam"}
-            for custom_model in self._iter_model_weights():
+            for custom_model in self.iter_model_weights():
                 if (
                     custom_model.is_file()
                     and custom_model.suffix == ""

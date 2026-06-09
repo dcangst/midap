@@ -13,6 +13,7 @@ class HybridSegmentation(UNetSegmentation):
     """
 
     supported_setups = ["Family_Machine"]
+    included_model_weights_folder = "model_weights_hybrid"
 
     def __init__(self, *args, **kwargs):
         """

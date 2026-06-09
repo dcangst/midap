@@ -21,6 +21,16 @@ class UNetSegmentation(SegmentationPredictor):
 
     supported_setups = ["Family_Machine", "Mother_Machine"]
 
+    @property
+    def included_model_weights_folder(self):
+        """
+        Returns the folder in which the included model weights for this segmentator are stored.
+        """
+        return {
+            "Family_Machine": "model_weights_legacy",
+            "Mother_Machine": "model_weights_mother_machine",
+        }[self.data_type]
+
     def __init__(self, *args, **kwargs):
         """
         Initializes the UNetSegmentation using the base class init

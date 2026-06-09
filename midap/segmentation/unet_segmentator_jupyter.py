@@ -16,6 +16,7 @@ class UNetSegmentationJupyter(UNetSegmentation):
     """
 
     supported_setups = ["Jupyter"]
+    included_model_weights_folder = "model_weights_legacy"
 
     def __init__(self, *args, **kwargs):
         """
@@ -49,7 +50,7 @@ class UNetSegmentationJupyter(UNetSegmentation):
 
             # Get all the labels
             labels = ['watershed']
-            model_weights = list(Path(self.path_model_weights).glob("*.h5"))
+            model_weights = [path for path in self.iter_model_weights() if path.suffix == ".h5"]
             labels += [mw.stem.replace("model_weights_", "") for mw in model_weights]
 
             self.all_segs_label = {}
