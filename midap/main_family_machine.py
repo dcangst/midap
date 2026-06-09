@@ -426,7 +426,7 @@ def run_family_machine(config, checkpoint, main_args, logger, restart=False, con
 
             if config.getboolean(identifier, "FluoChange") and not run_tracking:
                 logger.info(
-                    f"Performs fluo change analysis based on segmentation images..."
+                    "Performs fluo change analysis based on segmentation images..."
                 )
                 seg_fluo_change_analysis.main(
                     path=current_path,
