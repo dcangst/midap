@@ -79,6 +79,12 @@ def main(config_file="settings.ini", loglevel=7):
             )
         ],
         [sg.Input(key="pos", default_text=config.get("General", "IdentifierName"))],
+        [sg.Text("Path to folder with custom model weights: ", key="title_custom_model_weights", font="bold")],
+        [
+            sg.Input(
+                key="custom_model_weigths",
+                default_text=config.get("General", "CustomModelWeights")),
+                sg.FolderBrowse(initial_folder=config.get("General", "CustomModelWeights")), ],
         [sg.Column([[sg.OK(), sg.Cancel()]], key="col_final")],
     ]
 
@@ -100,6 +106,7 @@ def main(config_file="settings.ini", loglevel=7):
         "FolderPath": values["folder_name"],
         "FileType": values["file_type"],
         "IdentifierName": values["pos"],
+        "CustomModelWeights": values["custom_model_weigths"],
     }
 
     # Get all the idetifiers
