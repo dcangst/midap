@@ -85,7 +85,8 @@ def segmentation_instance(monkeypatch, img1):
 
     # get the instance
     unet = UNetSegmentation(
-        path_model_weights=tmpdir.name, postprocessing=True, div=16, connectivity=1
+        data_type="Family_Machine",
+        path_model_weights=[tmpdir.name], postprocessing=True, div=16, connectivity=1
     )
 
     yield unet
@@ -105,7 +106,7 @@ def test_run_image_stack(segmentation_instance):
     """
 
     # we read out the path model weights (because we stored the tempdir in there)
-    channel_path = segmentation_instance.path_model_weights
+    channel_path = segmentation_instance.path_model_weights[0]
 
     # we set the segmentation method to watershed for starters
     segmentation_instance.model_weights = "watershed"
@@ -148,7 +149,8 @@ def test_run_image_stack(segmentation_instance):
 @fixture()
 def unet_plain(tmp_path):
     return UNetSegmentation(
-        path_model_weights=str(tmp_path), postprocessing=False, div=16, connectivity=1
+        data_type="Family_Machine",
+        path_model_weights=[str(tmp_path)], postprocessing=False, div=16, connectivity=1
     )
 
 

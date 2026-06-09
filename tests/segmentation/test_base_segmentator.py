@@ -10,7 +10,7 @@ def test_base_cutout():
     """
 
     with pytest.raises(TypeError):
-        _ = SegmentationPredictor(path_model_weights=None, postprocessing=None)
+        _ = SegmentationPredictor(data_type="Family_Machine", path_model_weights=None, postprocessing=None)
 
 
 # Fixtures
@@ -24,6 +24,7 @@ def unet_instance(tmp_path):
     base-class utility methods without any I/O.
     """
     return UNetSegmentation(
+        data_type="Family_Machine",
         path_model_weights=str(tmp_path), postprocessing=True, div=16, connectivity=1
     )
 
@@ -55,6 +56,7 @@ def test_scale_pixel_vals_threshold(unet_instance):
     img_threshold < 1.0 should clip bright pixels before normalisation
     """
     instance = UNetSegmentation(
+        data_type=unet_instance.data_type,
         path_model_weights=unet_instance.path_model_weights,
         postprocessing=False,
         div=16,

@@ -49,7 +49,8 @@ def segmentation_instance(monkeypatch, img1):
     monkeypatch.setattr(io, "imread", lambda path: img1)
 
     instance = StarDistSegmentation(
-        path_model_weights=tmpdir.name, postprocessing=True, div=16, connectivity=1
+        data_type="Family_Machine",
+        path_model_weights=[tmpdir.name], postprocessing=True, div=16, connectivity=1
     )
 
     yield instance
@@ -73,7 +74,7 @@ def test_run_image_stack(segmentation_instance, img1):
     Tests the run_image_stack pipeline for StarDistSegmentation using a dummy
     segmentation method that returns empty label arrays.
     """
-    channel_path = segmentation_instance.path_model_weights
+    channel_path = segmentation_instance.path_model_weights[0]
 
     def dummy_seg(imgs):
         return [np.zeros(img.shape[:2], dtype=int) for img in imgs]
