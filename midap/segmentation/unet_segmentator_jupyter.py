@@ -112,7 +112,7 @@ class UNetSegmentationJupyter(UNetSegmentation):
                 self.segs[model_name] = overl
 
     
-    def segment_images_jupyter(self, imgs, model_weights):
+    def segment_images_jupyter(self, imgs, model_weights, clean_border: bool = False):
         """
         Sets the segmentation method according to the model_weights of the class
         """
@@ -125,4 +125,3 @@ class UNetSegmentationJupyter(UNetSegmentation):
 
         self.seg_label = np.array([measure.label(m) for m in self.mask])
         self.seg_bin = self.mask
-

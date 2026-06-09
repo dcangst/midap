@@ -394,7 +394,7 @@ class SegmentationJupyter(object):
             self.select_segmentator(nnt)
             for model in models:
                 model_name = "_".join((model).split("_")[2:])
-                self.pred.run_image_stack_jupyter(
+                self.pred.segment_images_jupyter(
                     self.imgs_cut, model_name, clean_border=False
                 )
                 self.dict_all_models["{}_{}".format(nnt, model)] = self.pred.seg_bin
@@ -541,7 +541,7 @@ class SegmentationJupyter(object):
         Segments all images for given model type and selected model weights.
         :param model_name: Name of chosen trained model.
         """
-        self.pred.run_image_stack_jupyter(self.imgs_cut, model_name, clean_border=False)
+        self.pred.segment_images_jupyter(self.imgs_cut, model_name, clean_border=False)
 
     def process_images(self):
         """
