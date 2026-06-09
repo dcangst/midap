@@ -1,17 +1,13 @@
 import os
-from pathlib import Path
-from typing import Collection, Union, List
+from typing import Union
 
-import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as io
-from skimage.segmentation import mark_boundaries
-from skimage import measure
-from stardist.models import StarDist2D
 from csbdeep.utils import normalize
+from skimage.segmentation import mark_boundaries
+from stardist.models import StarDist2D
 
 from .stardist_segmentator import StarDistSegmentation
-from ..utils import GUI_selector
 
 
 class StarDistSegmentationJupyter(StarDistSegmentation):
@@ -20,6 +16,7 @@ class StarDistSegmentationJupyter(StarDistSegmentation):
     """
 
     supported_setups = ["Jupyter"]
+    included_model_weights_folder = "model_weights_legacy"
 
     def __init__(self, *args, **kwargs):
         """
@@ -70,6 +67,7 @@ class StarDistSegmentationJupyter(StarDistSegmentation):
 
                 self.all_overl[model_name] = overl
                 self.all_segs_label[model_name] = self.seg_label
+
 
     def segment_images_jupyter(self, imgs, model_name):
         """

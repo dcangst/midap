@@ -1,15 +1,13 @@
 import os
 from pathlib import Path
-from typing import Collection, Union, List
+from typing import Union
 
-import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as io
-from skimage.segmentation import mark_boundaries
 from cellpose_omni import models
+from skimage.segmentation import mark_boundaries
 
 from .omni_segmentator import OmniSegmentation
-from ..utils import GUI_selector
 
 
 class OmniSegmentationJupyter(OmniSegmentation):

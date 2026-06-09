@@ -1,15 +1,14 @@
 import os
-from pathlib import Path
-from typing import Collection, Union, List
+from typing import Collection, List, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as io
-from stardist.models import StarDist2D
 from csbdeep.utils import normalize
+from stardist.models import StarDist2D
 
-from .base_segmentator import SegmentationPredictor
 from ..utils import GUI_selector
+from .base_segmentator import SegmentationPredictor
 
 
 class StarDistSegmentation(SegmentationPredictor):

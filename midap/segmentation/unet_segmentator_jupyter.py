@@ -1,19 +1,13 @@
 import os
 from pathlib import Path
-from typing import Collection, Union, List
+from typing import Union
 
-import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as io
-from skimage.filters import sobel
-from skimage.segmentation import watershed
-from skimage.segmentation import mark_boundaries
 from skimage import measure
-from tqdm import tqdm
+from skimage.segmentation import mark_boundaries
 
 from .unet_segmentator import UNetSegmentation
-from ..networks.unets import UNetv1
-from ..utils import GUI_selector
 
 
 class UNetSegmentationJupyter(UNetSegmentation):
